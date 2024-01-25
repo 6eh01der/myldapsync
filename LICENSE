@@ -1,4 +1,8 @@
-pgldapsync
+myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
+
+The MIT License (MIT)
+
+Copyright (c) 2024, Artur Lebedev
 
 Copyright (C) 2018 - 2023, EnterpriseDB Corporation
 

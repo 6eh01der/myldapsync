@@ -1,33 +1,31 @@
 ###############################################################################
 #
-# pgldapsync
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
 #
-# Synchronise Postgres roles with users in an LDAP directory.
-#
-# Copyright 2018 - 2023, EnterpriseDB Corporation
+# Synchronise MySQL users with users in an LDAP directory.
 #
 ###############################################################################
 
-"""Postgres connection functions."""
+"""MySQL connection functions."""
 
 import sys
 
-import psycopg2
+import mysql.connector
 
 
-def connect_pg_server(pg_connstr):
-    """Setup the connection to the Postgres server.
+def connect_my_server(my_connstr):
+    """Setup the connection to the MySQL server.
 
     Args:
-        pg_connstr (str): The Postgres connection string
+        my_connstr (str): The MySQL connection string
 
     Returns:
-        connection: The psycopg2 connection object
+        connection: The mysql-connector-python connection object
     """
     try:
-        conn = psycopg2.connect(pg_connstr)
-    except psycopg2.Error as exception:
-        sys.stderr.write("Error connecting to the Postgres server: %s\n" %
+        conn = mysql.connector.connect(my_connstr)
+    except mysql.connector.Error as exception:
+        sys.stderr.write("Error connecting to the MySQL server: %s\n" %
                          exception)
         return None
 

@@ -1,36 +1,34 @@
 ###############################################################################
 #
-# pgldapsync
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
 #
-# Synchronise Postgres roles with users in an LDAP directory.
-#
-# Copyright 2018 - 2023, EnterpriseDB Corporation
+# Synchronise MySQL users with users in an LDAP directory.
 #
 ###############################################################################
 
-"""Postgres role functions."""
+"""MySQL role functions."""
 
 import sys
 
 import ast
-import psycopg2
+import mysql.connector
 
 
-def get_pg_login_roles(conn):
-    """Get a list of login roles from the Postgres server.
+def get_my_users(conn):
+    """Get a list of user from the MySQL server.
 
     Args:
-        conn (connection): The Postgres connection object
+        conn (connection): The MySQL connection object
     Returns:
         str[]: A list of user names
     """
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT rolname FROM pg_authid WHERE rolcanlogin;")
+        cur.execute("SELECT user AS role_name FROM mysql.user WHERE account_locked='N' AND password_expired='N' AND authentication_string IS NOT NULL;")
         rows = cur.fetchall()
-    except psycopg2.Error as exception:
-        sys.stderr.write("Error retrieving Postgres login roles: %s\n" %
+    except mysql.connector.Error as exception:
+        sys.stderr.write("Error retrieving MySQL users: %s\n" %
                          exception)
         return None
 
@@ -44,22 +42,22 @@ def get_pg_login_roles(conn):
     return roles
 
 
-def get_filtered_pg_login_roles(config, conn):
-    """Get a filtered list of login roles from the Postgres server, having
+def get_filtered_my_users(config, conn):
+    """Get a filtered list of users from the MySQL server, having
     removed users to be ignored.
 
     Args:
         config (ConfigParser): The application configuration
-        conn (connection): The Postgres connection object
+        conn (connection): The MySQL connection object
     Returns:
-        str[]: A filtered list of login roles
+        str[]: A filtered list of users
     """
-    roles = get_pg_login_roles(conn)
+    roles = get_my_users(conn)
     if roles is None:
         return None
 
     # Remove ignored roles
-    for role in config.get('postgres', 'ignore_login_roles').split(','):
+    for role in config.get('mysql', 'ignore_users').split(','):
         try:
             roles.remove(role)
         except ValueError:
@@ -68,8 +66,8 @@ def get_filtered_pg_login_roles(config, conn):
     return roles
 
 
-def get_role_attributes(config, admin):
-    """Generate a list of role attributes to use when creating login roles
+def get_user_privileges(config, admin):
+    """Generate a list of user privileges to use when creating users
 
     Args:
         config (ConfigParser): The application configuration
@@ -77,44 +75,22 @@ def get_role_attributes(config, admin):
     Returns:
         str: A SQL snippet listing the role attributes
     """
-    attribute_list = ''
-    if config.getboolean('general', 'role_attribute_superuser') or admin:
-        attribute_list = attribute_list + 'SUPERUSER'
-    else:
-        attribute_list = attribute_list + 'NOSUPERUSER'
+    privilege_list = ''
+    if config.getboolean('general', 'role_privilege_all') or admin:
+        privilege_list = privilege_list + 'ALL'
 
-    if config.getboolean('general', 'role_attribute_createdb'):
-        attribute_list = attribute_list + ' CREATEDB'
-    else:
-        attribute_list = attribute_list + ' NOCREATEDB'
+    if config.getboolean('general', 'role_privilege_create'):
+        privilege_list = privilege_list + ' CREATE'
 
-    if config.getboolean('general', 'role_attribute_createrole'):
-        attribute_list = attribute_list + ' CREATEROLE'
-    else:
-        attribute_list = attribute_list + ' NOCREATEROLE'
+    if config.getboolean('general', 'role_privilege_create_role'):
+        privilege_list = privilege_list + ' CREATE ROLE'
 
-    if config.getboolean('general', 'role_attribute_noinherit'):
-        attribute_list = attribute_list + ' NOINHERIT'
-    else:
-        attribute_list = attribute_list + ' INHERIT'
-
-    if config.getboolean('general', 'role_attribute_bypassrls'):
-        attribute_list = attribute_list + ' BYPASSRLS'
-    else:
-        attribute_list = attribute_list + ' NOBYPASSRLS'
-
-    if config.getint('general', 'role_attribute_connection_limit') != -1:
-        attribute_list = attribute_list + ' CONNECTION LIMIT ' + \
-                         str(config.getint('general',
-                                           'role_attribute_connection_limit'
-                                           ))
-
-    return attribute_list
+    return privilege_list
 
 
-def get_role_grants(config, role, with_admin=False):
+def get_user_grants(config, role, with_admin=False):
     """Get a SQL string to GRANT membership to the configured roles when
-    creating a new login role.
+    creating a new user.
 
     Args:
         config (ConfigParser): The application configuration
@@ -140,7 +116,7 @@ def get_role_grants(config, role, with_admin=False):
         roles = roles[:-2]
 
     if roles != '':
-        sql = 'GRANT %s TO "%s"' % (roles, role)
+        sql = 'GRANT %s ON *.* TO "%s"' % (roles, role)
 
         if with_admin:
             sql = sql + " WITH ADMIN OPTION"
@@ -149,62 +125,38 @@ def get_role_grants(config, role, with_admin=False):
 
     return sql
 
-
-def get_guc_list(config, role):
-    """Get a SQL string to set GUCs for the specified role
-
-    Args:
-        config (ConfigParser): The application configuration
-        role (str): The role name to be granted additional roles
-    Returns:
-        str: A SQL snippet listing the ALTER ROLE statements required
-    """
-    sql = ''
-    gucs = ast.literal_eval(config.get('general', 'gucs_to_set'))
-
-    for guc in gucs:
-        if gucs[guc][1] != '':
-            sql += 'ALTER ROLE "%s" IN DATABASE "%s" SET %s TO \'%s\';\n' % \
-                   (role, gucs[guc][1], guc, gucs[guc][0].replace("'", "''"))
-        else:
-            sql += 'ALTER ROLE "%s" SET %s TO \'%s\';\n' % \
-                   (role, guc, gucs[guc][0].replace("'", "''"))
-
-    return sql.rstrip()
-
-
-def get_create_login_roles(ldap_users, pg_roles):
-    """Get a filtered list of login roles to create.
+def get_create_users(ldap_users, my_users):
+    """Get a filtered list of users to create.
 
     Args:
         ldap_users (str[]): A list of users in LDAP
-        pg_roles (str[]): A list of roles in Postgres
+        my_users (str[]): A list of users in MySQL
 
     Returns:
-        str[]: A list of roles that exist in LDAP but not Postgres
+        str[]: A list of roles that exist in LDAP but not in MySQL
     """
     roles = []
 
     for user in ldap_users:
-        if user not in pg_roles:
+        if user not in my_users:
             roles.append(user)
 
     return roles
 
 
-def get_drop_login_roles(ldap_users, pg_roles):
-    """Get a filtered list of login roles to drop.
+def get_drop_users(ldap_users, my_users):
+    """Get a filtered list of users to drop.
 
     Args:
         ldap_users (str[]): A list of users in LDAP
-        pg_roles (str[]): A list of roles in Postgres
+        my_users (str[]): A list of roles in MySQL
 
     Returns:
-        str[]: A list of roles that exist in Postgres but not LDAP
+        str[]: A list of roles that exist in MySQL but not in LDAP
     """
     roles = []
 
-    for role in pg_roles:
+    for role in my_users:
         if role not in ldap_users:
             roles.append(role)
 

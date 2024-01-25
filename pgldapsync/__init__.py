@@ -1,14 +1,12 @@
 ###############################################################################
 #
-# pgldapsync
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
 #
-# Synchronise Postgres roles with users in an LDAP directory.
-#
-# Copyright 2018 - 2023, EnterpriseDB Corporation
+# Synchronise MySQL users with users in an LDAP directory.
 #
 ###############################################################################
 
-"""pgldapsync main entry point."""
+"""myldapsync main entry point."""
 
 # FIX THIS!
 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -18,10 +16,10 @@ import os
 
 import configparser
 
-from pgldapsync.ldaputils.connection import connect_ldap_server
-from pgldapsync.ldaputils.users import *
-from pgldapsync.pgutils.connection import connect_pg_server
-from pgldapsync.pgutils.roles import *
+from myldapsync.ldaputils.connection import connect_ldap_server
+from myldapsync.ldaputils.users import *
+from myldapsync.myutils.connection import connect_my_server
+from myldapsync.myutils.roles import *
 
 
 def read_command_line():
@@ -31,7 +29,7 @@ def read_command_line():
         ArgumentParser: The parsed arguments object
     """
     parser = argparse.ArgumentParser(
-        description='Synchronise users and groups from LDAP/AD to PostgreSQL.')
+        description='Synchronise users and groups from LDAP/AD to MySQL.')
     parser.add_argument("--dry-run", "-d", action='store_true',
                         help="don't apply changes to the database server, "
                              "dump the SQL to stdout instead")
@@ -48,7 +46,7 @@ def read_config(file):
 
     Args:
         file (str): The config file to read
-        pg_roles (str[]): A list of roles in Postgres
+        my_user (str[]): A list of users in MySQL
 
     Returns:
         ConfigParser: The config object
@@ -105,33 +103,33 @@ def main():
     if ldap_admin_users is None:
         sys.exit(1)
 
-    # Connect to Postgres and get the roles we care about
-    pg_conn = connect_pg_server(config.get('postgres', 'server_connstr'))
-    if pg_conn is None:
+    # Connect to MySQL and get the roles we care about
+    my_conn = connect_my_server(config.get('mysql', 'server_connstr'))
+    if my_conn is None:
         sys.exit(1)
 
-    pg_login_roles = get_filtered_pg_login_roles(config, pg_conn)
-    if pg_login_roles is None:
+    my_users = get_filtered_my_users(config, my_conn)
+    if my_users is None:
         sys.exit(1)
 
-    # Compare the LDAP users and Postgres roles and get the lists of roles
+    # Compare the LDAP and MySQL users and get the lists of users
     # to add and drop.
-    login_roles_to_create = get_create_login_roles(ldap_users, pg_login_roles)
-    login_roles_to_drop = get_drop_login_roles(ldap_users, pg_login_roles)
+    users_to_create = get_create_users(ldap_users, my_users)
+    users_to_drop = get_drop_lusers(ldap_users, my_users)
 
     # Create/drop roles if required
     have_work = ((config.getboolean('general',
-                                    'add_ldap_users_to_postgres') and
-                  len(login_roles_to_create) > 0) or
+                                    'add_ldap_users_to_mysql') and
+                  len(users_to_create) > 0) or
                  (config.getboolean('general',
-                                    'remove_login_roles_from_postgres') and
-                  len(login_roles_to_drop) > 0))
+                                    'remove_users_from_mysql') and
+                  len(users_to_drop) > 0))
 
     # Initialise the counters for operations/errors
-    login_roles_added = 0
-    login_roles_dropped = 0
-    login_roles_add_errors = 0
-    login_roles_drop_errors = 0
+    users_added = 0
+    users_dropped = 0
+    users_add_errors = 0
+    users_drop_errors = 0
 
     # Warn the user we're in dry run mode
     if args.dry_run:
@@ -145,29 +143,27 @@ def main():
         if args.dry_run:
             print("BEGIN;")
         else:
-            cur = pg_conn.cursor()
+            cur = my_conn.cursor()
             cur.execute("BEGIN;")
 
-    # If we need to add roles to Postgres, then do so
-    if config.getboolean('general', 'add_ldap_users_to_postgres'):
+    # If we need to add users to MySQL, then do so
+    if config.getboolean('general', 'add_ldap_users_to_mysql'):
 
         # For each role, get the required attributes and SQL snippets
-        for role in login_roles_to_create:
-            role_name = role.replace('\'', '\\\'')
-            role_grants = get_role_grants(config, role_name)
-            role_admin_grants = get_role_grants(config, role_name, True)
-            attribute_list = get_role_attributes(config,
-                                                 (role in ldap_admin_users))
-            guc_list = get_guc_list(config, role_name)
+        for user in users_to_create:
+            user_name = user.replace('\'', '\\\'')
+            user_grants = get_user_grants(config, user_name)
+            user_admin_grants = get_user_grants(config, user_name, True)
+            privilege_list = get_user_attributes(config,
+                                                 (user in ldap_admin_users))
 
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE ROLE "%s" LOGIN %s;' %
-                      (role_name, attribute_list))
-                print(role_grants)
-                print(role_admin_grants)
-                print(guc_list)
+                print('CREATE USER "%s";' %
+                      (user_name, privilege_list))
+                print(user_grants)
+                print(user_admin_grants)
             else:
 
                 # This is a live run, so directly execute the SQL generated.
@@ -177,26 +173,26 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE ROLE "%s" LOGIN %s;%s%s%s'
-                                % (role_name, attribute_list,
-                                   role_grants, role_admin_grants, guc_list))
-                    login_roles_added = login_roles_added + 1
-                except psycopg2.Error as exception:
-                    sys.stderr.write("Error creating role %s: %s" % (role,
+                    cur.execute('SAVEPOINT cr; CREATE USER "%s";%s%s%s'
+                                % (user_name, privilege_list,
+                                   user_grants, user_admin_grants))
+                    users_added = users_added + 1
+                except mysql.connector.Error as exception:
+                    sys.stderr.write("Error creating user %s: %s" % (role,
                                                                      exception))
-                    login_roles_add_errors = login_roles_add_errors + 1
+                    users_add_errors = users_add_errors + 1
                     cur.execute('ROLLBACK TO SAVEPOINT cr;')
 
-    # If we need to drop roles from Postgres, then do so
-    if config.getboolean('general', 'remove_login_roles_from_postgres'):
+    # If we need to drop roles from MySQL, then do so
+    if config.getboolean('general', 'remove_users_from_mysql'):
 
         # For each role to drop, just run the DROP statement
-        for role in login_roles_to_drop:
+        for role in users_to_drop:
 
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('DROP ROLE "%s";' % role.replace('\'', '\\\''))
+                print('DROP USER "%s";' % role.replace('\'', '\\\''))
             else:
 
                 # This is a live run, so directly execute the SQL generated.
@@ -206,13 +202,13 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT dr; DROP ROLE "%s";' %
+                    cur.execute('SAVEPOINT dr; DROP USER "%s";' %
                                 role.replace('\'', '\\\''))
-                    login_roles_dropped = login_roles_dropped + 1
-                except psycopg2.Error as exception:
-                    sys.stderr.write("Error dropping role %s: %s" % (role,
+                    users_dropped = users_dropped + 1
+                except mysql.connector.Error as exception:
+                    sys.stderr.write("Error dropping user %s: %s" % (role,
                                                                      exception))
-                    login_roles_drop_errors = login_roles_drop_errors + 1
+                    users_drop_errors = users_drop_errors + 1
                     cur.execute('ROLLBACK TO SAVEPOINT dr;')
 
     if have_work:
@@ -225,13 +221,13 @@ def main():
             cur.close()
 
             # Print the summary of work completed
-            print("Login roles added to Postgres:     %d" % login_roles_added)
-            print("Login roles dropped from Postgres: %d" % login_roles_dropped)
-            if login_roles_add_errors > 0:
-                print("Errors adding login roles:         %d" %
-                      login_roles_add_errors)
-            if login_roles_drop_errors > 0:
-                print("Errors dropping login roles:       %d" %
-                      login_roles_drop_errors)
+            print("Users added to MySQL:     %d" % users_added)
+            print("Users dropped from MySQL: %d" % users_dropped)
+            if users_add_errors > 0:
+                print("Errors adding users:         %d" %
+                      users_add_errors)
+            if users_drop_errors > 0:
+                print("Errors dropping users:       %d" %
+                      users_drop_errors)
     else:
-        print("No login roles were added or dropped.")
+        print("No users were added or dropped.")

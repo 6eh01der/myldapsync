@@ -1,3 +1,3 @@
-include pgldapsync/config_default.ini
-include pgldapsync/config.ini.example
+include myldapsync/config_default.ini
+include myldapsync/config.ini.example
 include requirements.txt

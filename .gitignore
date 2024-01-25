@@ -1,5 +1,5 @@
 /.idea/
 /build/
 /dist/
-/pgldapsync.egg-info/
-/pgldapsync/config.ini
+/myldapsync.egg-info/
+/myldapsync/config.ini

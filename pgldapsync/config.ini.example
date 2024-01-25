@@ -65,16 +65,16 @@ ignore_users = Manager,ldap.sync
 
 
 ##########################################################################
-# Postgres access configuration
+# MySQL access configuration
 ##########################################################################
 
-[postgres]
+[mysql]
 
-# Postgres server connection string (REQUIRED)
-server_connstr = hostaddr=127.0.0.1 port=5432 dbname=postgres user=postgres
+# MySQL server connection string (REQUIRED)
+server_connstr = hostaddr=127.0.0.1 port=3306 dbname=mysql user=root
 
-# A comma delimited list of login role names to ignore
-ignore_login_roles = postgres
+# A comma delimited list of users to ignore
+ignore_users = root
 
 ##########################################################################
 # General configuration
@@ -82,46 +82,24 @@ ignore_login_roles = postgres
 
 [general]
 
-# Add LDAP users to Postgres if they don't exist, or ignore them?
-add_ldap_users_to_postgres = true
+# Add LDAP users to MySQL if they don't exist, or ignore them?
+add_ldap_users_to_mysql = true
 
-# Remove Postgres login roles if they don't exist in LDAP, or ignore them?
-remove_login_roles_from_postgres = true
+# Remove MySQL users if they don't exist in LDAP, or ignore them?
+remove_users_from_mysql = true
 
-# Attributes to grant to login roles in Postgres. Note these attributes
+# Privileges to grant to users in MySQL. Note these privileges
 # are only applied to roles when created. Existing roles are unaffected.
-role_attribute_superuser = false
-role_attribute_createdb = false
-role_attribute_createrole = false
-role_attribute_noinherit = false
-role_attribute_bypassrls = false
-
-# Role connection limit attribute. Set to -1 to ignore, or an integer.
-# Note this attribute is only applied to roles when created. Existing
-# roles are unaffected.
-role_attribute_connection_limit = -1
+role_privilege_all = false
+role_privilege_create = false
+role_privilege_create_role = false
 
 # A comma delimited list of roles to grant membership to when creating
-# login roles. Note that existing roles will not be modified. Roles specified
-# here must already exist in Postgres.
+# users. Note that existing roles will not be modified. Roles specified
+# here must already exist in MySQL.
 roles_to_grant = group1,group2
 
 # A comma delimited list of roles to grant membership to with ADMIN when
-# creating login roles. Note that existing roles will not be modified. Roles
-# specified here must already exist in Postgres.
+# creating users. Note that existing roles will not be modified. Roles
+# specified here must already exist in MySQL.
 roles_to_grant_with_admin = group3
-
-# A dictionary of GUCs to set for each user, as "ALTER ROLE foo IN DATABASE bar
-# SET blah TO value" would do. The dictionary should look as follows:
-# gucs_to_set = {
-#     'client_min_messages': ['debug1', ''],
-#     'application_name': ['My Cool App', 'postgres']
-#     }
-# Note that the database field may be left empty to apply to all databases.
-# Additionally note that the closing brace must be properly indented!
-gucs_to_set = {
-    }
-
-
-
-

@@ -1,10 +1,8 @@
 ###############################################################################
 #
-# pgldapsync
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
 #
-# Synchronise Postgres roles with users in an LDAP directory.
-#
-# Copyright 2018 - 2023, EnterpriseDB Corporation
+# Synchronise MySQL users with users in an LDAP directory.
 #
 ###############################################################################
 

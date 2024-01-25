@@ -1,14 +1,12 @@
 ###############################################################################
 #
-# pgldapsync
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
 #
-# Synchronise Postgres roles with users in an LDAP directory.
-#
-# Copyright 2018 - 2023, EnterpriseDB Corporation
+# Synchronise MySQL users with users in an LDAP directory.
 #
 ###############################################################################
 
-"""pgldapsync package creation."""
+"""myldapsync package creation."""
 
 import setuptools
 
@@ -20,15 +18,15 @@ with open('README.md', 'r', encoding='utf-8') as fh:
         required = reqf.read().splitlines()
 
 setuptools.setup(
-    name="pgldapsync",
-    version="3.0.0",
+    name="myldapsync",
+    version="1.0.0",
     author="Dave Page",
-    author_email="dave.page@enterprisedb.com",
-    description="Synchronise LDAP users to Postgres",
-    license='PostgreSQL',
+    author_email="ras_atari@mail.ru",
+    description="Synchronise LDAP users to MySQL",
+    license='MySQL',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/enterprisedb/pgldapsync",
+    url="https://github.com/6eh01der/myldapsync",
     packages=setuptools.find_packages(),
     install_requires=required,
     python_requires='>=3.7',
@@ -39,11 +37,11 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        "License :: OSI Approved :: PostgreSQL License",
+        "License :: OSI Approved :: MySQL License",
         "Operating System :: OS Independent",
     ],
     entry_points={
-        'console_scripts': ['pgldapsync=pgldapsync.__init__:main'],
+        'console_scripts': ['myldapsync=myldapsync.__init__:main'],
     },
     include_package_data=True
 )
