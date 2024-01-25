@@ -89,17 +89,17 @@ add_ldap_users_to_mysql = true
 remove_users_from_mysql = true
 
 # Privileges to grant to users in MySQL. Note these privileges
-# are only applied to roles when created. Existing roles are unaffected.
-role_privilege_all = false
-role_privilege_create = false
-role_privilege_create_role = false
+# are only applied to users when created. Existing users are unaffected.
+user_privilege_all = false
+user_privilege_create = false
+user_privilege_create_role = false
 
 # A comma delimited list of roles to grant membership to when creating
-# users. Note that existing roles will not be modified. Roles specified
+# users. Note that existing users will not be modified. Roles specified
 # here must already exist in MySQL.
 roles_to_grant = group1,group2
 
 # A comma delimited list of roles to grant membership to with ADMIN when
-# creating users. Note that existing roles will not be modified. Roles
+# creating users. Note that existing users will not be modified. Roles
 # specified here must already exist in MySQL.
 roles_to_grant_with_admin = group3

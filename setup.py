@@ -19,8 +19,8 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name="myldapsync",
-    version="1.0.0",
-    author="Dave Page",
+    version="0.0.1",
+    author="Artur Lebedev",
     author_email="ras_atari@mail.ru",
     description="Synchronise LDAP users to MySQL",
     license='MySQL',

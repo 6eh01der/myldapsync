@@ -6,7 +6,7 @@
 #
 ###############################################################################
 
-"""MySQL role functions."""
+"""MySQL user functions."""
 
 import sys
 
@@ -25,21 +25,21 @@ def get_my_users(conn):
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT user AS role_name FROM mysql.user WHERE account_locked='N' AND password_expired='N' AND authentication_string IS NOT NULL;")
+        cur.execute("SELECT user FROM mysql.user WHERE account_locked='N' AND password_expired='N' AND authentication_string IS NOT NULL;")
         rows = cur.fetchall()
     except mysql.connector.Error as exception:
         sys.stderr.write("Error retrieving MySQL users: %s\n" %
                          exception)
         return None
 
-    roles = []
+    users = []
 
     for row in rows:
-        roles.append(row[0])
+        users.append(row[0])
 
     cur.close()
 
-    return roles
+    return users
 
 
 def get_filtered_my_users(config, conn):
@@ -52,18 +52,18 @@ def get_filtered_my_users(config, conn):
     Returns:
         str[]: A filtered list of users
     """
-    roles = get_my_users(conn)
-    if roles is None:
+    users = get_my_users(conn)
+    if users is None:
         return None
 
-    # Remove ignored roles
-    for role in config.get('mysql', 'ignore_users').split(','):
+    # Remove ignored users
+    for user in config.get('mysql', 'ignore_users').split(','):
         try:
-            roles.remove(role)
+            users.remove(user)
         except ValueError:
             pass
 
-    return roles
+    return users
 
 
 def get_user_privileges(config, admin):
@@ -73,32 +73,32 @@ def get_user_privileges(config, admin):
         config (ConfigParser): The application configuration
         admin (bool): Should the user be a superuser regardless of the config?
     Returns:
-        str: A SQL snippet listing the role attributes
+        str: A SQL snippet listing the user privileges
     """
     privilege_list = ''
-    if config.getboolean('general', 'role_privilege_all') or admin:
+    if config.getboolean('general', 'user_privilege_all') or admin:
         privilege_list = privilege_list + 'ALL'
 
-    if config.getboolean('general', 'role_privilege_create'):
+    if config.getboolean('general', 'user_privilege_create'):
         privilege_list = privilege_list + ' CREATE'
 
-    if config.getboolean('general', 'role_privilege_create_role'):
+    if config.getboolean('general', 'user_privilege_create_role'):
         privilege_list = privilege_list + ' CREATE ROLE'
 
     return privilege_list
 
 
-def get_user_grants(config, role, with_admin=False):
+def get_user_grants(config, user, with_admin=False):
     """Get a SQL string to GRANT membership to the configured roles when
     creating a new user.
 
     Args:
         config (ConfigParser): The application configuration
-        role (str): The role name to be granted additional roles
+        user (str): The user name to be granted additional roles
         with_admin (bool): Generate a list of roles that will have the WITH
             ADMIN OPTION specified, if True
     Returns:
-        str: A SQL snippet listing the role GRANT statements required
+        str: A SQL snippet listing the user GRANT statements required
     """
     roles = ''
     sql = ''
@@ -116,7 +116,7 @@ def get_user_grants(config, role, with_admin=False):
         roles = roles[:-2]
 
     if roles != '':
-        sql = 'GRANT %s ON *.* TO "%s"' % (roles, role)
+        sql = 'GRANT %s ON *.* TO "%s"' % (roles, user)
 
         if with_admin:
             sql = sql + " WITH ADMIN OPTION"
@@ -133,15 +133,15 @@ def get_create_users(ldap_users, my_users):
         my_users (str[]): A list of users in MySQL
 
     Returns:
-        str[]: A list of roles that exist in LDAP but not in MySQL
+        str[]: A list of users that exist in LDAP but not in MySQL
     """
-    roles = []
+    users = []
 
     for user in ldap_users:
         if user not in my_users:
-            roles.append(user)
+            users.append(user)
 
-    return roles
+    return users
 
 
 def get_drop_users(ldap_users, my_users):
@@ -149,15 +149,15 @@ def get_drop_users(ldap_users, my_users):
 
     Args:
         ldap_users (str[]): A list of users in LDAP
-        my_users (str[]): A list of roles in MySQL
+        my_users (str[]): A list of users in MySQL
 
     Returns:
-        str[]: A list of roles that exist in MySQL but not in LDAP
+        str[]: A list of users that exist in MySQL but not in LDAP
     """
-    roles = []
+    users = []
 
-    for role in my_users:
-        if role not in ldap_users:
-            roles.append(role)
+    for users in my_users:
+        if user not in ldap_users:
+            users.append(user)
 
-    return roles
+    return users

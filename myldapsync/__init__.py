@@ -19,7 +19,7 @@ import configparser
 from myldapsync.ldaputils.connection import connect_ldap_server
 from myldapsync.ldaputils.users import *
 from myldapsync.myutils.connection import connect_my_server
-from myldapsync.myutils.roles import *
+from myldapsync.myutils.users import *
 
 
 def read_command_line():
@@ -103,7 +103,7 @@ def main():
     if ldap_admin_users is None:
         sys.exit(1)
 
-    # Connect to MySQL and get the roles we care about
+    # Connect to MySQL and get the users we care about
     my_conn = connect_my_server(config.get('mysql', 'server_connstr'))
     if my_conn is None:
         sys.exit(1)
@@ -117,7 +117,7 @@ def main():
     users_to_create = get_create_users(ldap_users, my_users)
     users_to_drop = get_drop_lusers(ldap_users, my_users)
 
-    # Create/drop roles if required
+    # Create/drop users if required
     have_work = ((config.getboolean('general',
                                     'add_ldap_users_to_mysql') and
                   len(users_to_create) > 0) or
@@ -149,7 +149,7 @@ def main():
     # If we need to add users to MySQL, then do so
     if config.getboolean('general', 'add_ldap_users_to_mysql'):
 
-        # For each role, get the required attributes and SQL snippets
+        # For each user, get the required attributes and SQL snippets
         for user in users_to_create:
             user_name = user.replace('\'', '\\\'')
             user_grants = get_user_grants(config, user_name)
@@ -169,7 +169,7 @@ def main():
                 # This is a live run, so directly execute the SQL generated.
                 # For each statement, create a savepoint so we can rollback
                 # to it if there's an error. That allows us to fail only
-                # a single role rather than all of them.
+                # a single user rather than all of them.
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
@@ -178,35 +178,35 @@ def main():
                                    user_grants, user_admin_grants))
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
-                    sys.stderr.write("Error creating user %s: %s" % (role,
+                    sys.stderr.write("Error creating user %s: %s" % (user,
                                                                      exception))
                     users_add_errors = users_add_errors + 1
                     cur.execute('ROLLBACK TO SAVEPOINT cr;')
 
-    # If we need to drop roles from MySQL, then do so
+    # If we need to drop users from MySQL, then do so
     if config.getboolean('general', 'remove_users_from_mysql'):
 
-        # For each role to drop, just run the DROP statement
-        for role in users_to_drop:
+        # For each user to drop, just run the DROP statement
+        for user in users_to_drop:
 
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('DROP USER "%s";' % role.replace('\'', '\\\''))
+                print('DROP USER "%s";' % user.replace('\'', '\\\''))
             else:
 
                 # This is a live run, so directly execute the SQL generated.
                 # For each statement, create a savepoint so we can rollback
                 # to it if there's an error. That allows us to fail only
-                # a single role rather than all of them.
+                # a single user rather than all of them.
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
                     cur.execute('SAVEPOINT dr; DROP USER "%s";' %
-                                role.replace('\'', '\\\''))
+                                user.replace('\'', '\\\''))
                     users_dropped = users_dropped + 1
                 except mysql.connector.Error as exception:
-                    sys.stderr.write("Error dropping user %s: %s" % (role,
+                    sys.stderr.write("Error dropping user %s: %s" % (user,
                                                                      exception))
                     users_drop_errors = users_drop_errors + 1
                     cur.execute('ROLLBACK TO SAVEPOINT dr;')
