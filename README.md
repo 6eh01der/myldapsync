@@ -1,4 +1,4 @@
-# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
+# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation (work in progress)
 # pgldapsync - https://github.com/EnterpriseDB/pgldapsync
 
 This Python module allows you to synchronise MySQL users
