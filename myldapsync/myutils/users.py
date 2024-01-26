@@ -119,7 +119,7 @@ def get_user_grants(config, user, with_admin=False):
         roles = roles[:-2]
 
     if roles != '':
-        sql = 'GRANT "%s" ON *.* TO "%s"' % (roles, user)
+        sql = 'GRANT "%s" TO "%s"' % (roles, user)
 
         if with_admin:
             sql = sql + " WITH ADMIN OPTION"
