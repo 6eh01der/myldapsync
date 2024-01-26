@@ -18,6 +18,7 @@ import configparser
 
 from myldapsync.ldaputils.connection import connect_ldap_server
 from myldapsync.ldaputils.users import *
+from myldapsync.ldaputils.ldap import *
 from myldapsync.myutils.connection import connect_my_server
 from myldapsync.myutils.users import *
 
@@ -94,6 +95,11 @@ def main():
     if ldap_users is None:
         sys.exit(1)
 
+    # Get ldap base dn and search filter
+    ldap_conf = get_ldap_conf(config, False)
+    if ldap_conf is None:
+        sys.exit(1)
+
     # Get the LDAP admin users, if the base DN and filter are configured
     if config.get('ldap', 'admin_base_dn') == '' or \
             config.get('ldap', 'admin_filter_string') == '':
@@ -160,8 +166,9 @@ def main():
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE USER "%s" IDENTIFIED WITH ldap_simple;' %
-                      (user_name, privilege_list))
+                print('CREATE USER "%s" IDENTIFIED WITH authentication_ldap_simple BY "uid=%s,%s"; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
+                        (user_name, user_name, ldap_conf[0], privilege_list, user_name, user_grants, user_admin_grants, user_name))
+                print(privilege_list)
                 print(user_grants)
                 print(user_admin_grants)
             else:
@@ -173,9 +180,8 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED WITH ldap_simple;%s%s%s'
-                                % (user_name, privilege_list,
-                                   user_grants, user_admin_grants))
+                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED WITH authentication_ldap_simple BY "uid=%s,%s"; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
+                                   (user_name, user_name, ldap_conf[0], privilege_list, user_name, user_grants, user_admin_grants, user_name))
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,
