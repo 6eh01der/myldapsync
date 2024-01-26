@@ -4,6 +4,8 @@
 This Python module allows you to synchronise MySQL users
 with users in an LDAP directory.
 
+Require MySQL 8 with installed and configured simple LDAP Authentication Plugin.
+
 *myldapsync is supported on Python 3.7 or later.*
 
 In order to use it, you will need to create a _config.ini_ 
