@@ -160,7 +160,7 @@ def main():
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE USER "%s";' %
+                print('CREATE USER "%s" IDENTIFIED WITH ldap_simple;' %
                       (user_name, privilege_list))
                 print(user_grants)
                 print(user_admin_grants)
@@ -173,7 +173,7 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE USER "%s";%s%s%s'
+                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED WITH ldap_simple;%s%s%s'
                                 % (user_name, privilege_list,
                                    user_grants, user_admin_grants))
                     users_added = users_added + 1
