@@ -85,6 +85,36 @@ def get_user_privileges(config, admin):
     if config.getboolean('general', 'user_privilege_create_role'):
         privilege_list = privilege_list + 'CREATE ROLE'+ ', '
 
+    if config.getboolean('general', 'user_privilege_alter'):
+        privilege_list = privilege_list + 'CREATE, INSERT, ALTER'+ ', '
+
+    if config.getboolean('general', 'user_privilege_create_user'):
+        privilege_list = privilege_list + 'CREATE USER'+ ', '
+
+    if config.getboolean('general', 'user_privilege_alter_rename'):
+        privilege_list = privilege_list + 'CREATE, INSERT, ALTER, DROP'+ ', '
+
+    if config.getboolean('general', 'user_privilege_event'):
+        privilege_list = privilege_list + 'EVENT'+ ', '
+
+    if config.getboolean('general', 'user_privilege_execute'):
+        privilege_list = privilege_list + 'EXECUTE'+ ', '
+
+    if config.getboolean('general', 'user_privilege_trigger'):
+        privilege_list = privilege_list + 'TRIGGER'+ ', '
+
+    if config.getboolean('general', 'user_privilege_INSERT'):
+        privilege_list = privilege_list + 'INSERT'+ ', '
+
+    if config.getboolean('general', 'user_privilege_UPDATE'):
+        privilege_list = privilege_list + 'UPDATE'+ ', '
+
+    if config.getboolean('general', 'user_privilege_DELETE'):
+        privilege_list = privilege_list + 'DELETE'+ ', '
+
+    if config.getboolean('general', 'user_privilege_DROP'):
+        privilege_list = privilege_list + 'DROP'+ ', '
+
     if privilege_list.endswith(', '):
         privilege_list = privilege_list[:-2]
 
