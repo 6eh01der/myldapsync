@@ -6,7 +6,8 @@ with users in an LDAP directory.
 
 Require MySQL 8 with installed and configured simple or sasl LDAP Authentication Plugin.
 
-Percona Server for MySQL - https://docs.percona.com/percona-server/8.0/ldap-authentication.
+Percona Server for MySQL - https://docs.percona.com/percona-server/8.0/ldap-authentication
+
 MySQL - https://dev.mysql.com/doc/refman/8.0/en/ldap-pluggable-authentication.html
 
 *myldapsync is supported on Python 3.7 or later.*
