@@ -85,8 +85,8 @@ ignore_users = root
 # Authentication plugin (one of simple, sasl or pam)
 auth_plugin = simple
 
-# Percona Server for MySQL or "vanilla" MySQL.
-percona_server_for_mysql = true
+# Database management system - one of mysql, psms (Percona Server for MySQL) or mariadb.
+dbms = psms
 
 # Add LDAP users to MySQL if they don't exist, or ignore them?
 add_ldap_users_to_mysql = true
