@@ -151,6 +151,12 @@ def main():
             cur = my_conn.cursor()
             cur.execute("BEGIN;")
 
+    # Set authentication plugin
+    if config.getboolean('general', 'use_sasl'):
+        auth_plugin='authentication_ldap_sasl'
+    else:
+        auth_plugin='authentication_ldap_simple'     
+
     # If we need to add users to MySQL, then do so
     if config.getboolean('general', 'add_ldap_users_to_mysql'):
 
@@ -165,8 +171,8 @@ def main():
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE USER "%s" IDENTIFIED WITH authentication_ldap_simple; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
-                        (user_name, privilege_list, user_name, user_grants, user_admin_grants, user_name))
+                print('CREATE USER "%s" IDENTIFIED WITH %s; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
+                        (user_name, auth_plugin, privilege_list, user_name, user_grants, user_admin_grants, user_name))
                 print(privilege_list)
                 print(user_grants)
                 print(user_admin_grants)
@@ -179,8 +185,8 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED WITH authentication_ldap_simple; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
-                                   (user_name, privilege_list, user_name, user_grants, user_admin_grants, user_name))
+                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED WITH %s; GRANT "%s" ON *.* TO "%s"; GRANT "%s","%s" TO "%s";' %
+                                   (user_name, auth_plugin, privilege_list, user_name, user_grants, user_admin_grants, user_name))
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,

@@ -4,7 +4,7 @@
 This Python module allows you to synchronise MySQL users
 with users in an LDAP directory.
 
-Require MySQL 8 with installed and configured simple LDAP Authentication Plugin.
+Require MySQL 8 with installed and configured simple or sasl LDAP Authentication Plugin.
 
 Percona Server for MySQL - https://docs.percona.com/percona-server/8.0/ldap-authentication.
 MySQL - https://dev.mysql.com/doc/refman/8.0/en/ldap-pluggable-authentication.html
