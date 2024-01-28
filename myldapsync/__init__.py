@@ -152,10 +152,15 @@ def main():
             cur.execute("BEGIN;")
 
     # Set authentication plugin
-    if config.getboolean('general', 'use_sasl'):
-        auth_plugin='authentication_ldap_sasl'
-    else:
-        auth_plugin='authentication_ldap_simple'     
+    if config.get('general', 'auth_plugin') == 'simple':
+        auth_plugin = 'authentication_ldap_simple'
+    elif config.get('general', 'auth_plugin') == 'sasl':
+        auth_plugin = 'authentication_ldap_sasl'   
+    elif config.get('general', 'auth_plugin') == 'pam':
+        if config.getboolean('general', 'percona_server_for_mysql'):
+            auth_plugin = 'auth_pam'
+        else:
+            auth_plugin = 'authentication_pam'
 
     # If we need to add users to MySQL, then do so
     if config.getboolean('general', 'add_ldap_users_to_mysql'):

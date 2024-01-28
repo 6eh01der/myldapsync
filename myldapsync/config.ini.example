@@ -82,8 +82,11 @@ ignore_users = root
 
 [general]
 
-# Use sasl instead of simple LDAP authentication plugin
-use_sasl = false
+# Authentication plugin (one of simple, sasl or pam)
+auth_plugin = simple
+
+# Percona Server for MySQL or "vanilla" MySQL.
+percona_server_for_mysql = true
 
 # Add LDAP users to MySQL if they don't exist, or ignore them?
 add_ldap_users_to_mysql = true
