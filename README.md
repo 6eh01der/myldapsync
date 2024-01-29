@@ -18,6 +18,10 @@ https://dev.mysql.com/doc/refman/8.0/en/ldap-pluggable-authentication.html
 
 https://dev.mysql.com/doc/refman/8.0/en/pam-pluggable-authentication.html
 
+MariaDB:
+
+https://mariadb.com/kb/en/authentication-plugin-pam/
+
 *myldapsync is supported on Python 3.7 or later.*
 
 In order to use it, you will need to create a _config.ini_ 
