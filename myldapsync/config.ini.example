@@ -113,10 +113,10 @@ user_privilege_drop = false
 
 # A comma delimited list of roles to grant membership to when creating
 # users. Note that existing users will not be modified. Roles specified
-# here must already exist in MySQL.
+# here must already exist in MySQL. Supported in MySQL 8+ and MariaDB 10+.
 roles_to_grant = group1,group2
 
 # A comma delimited list of roles to grant membership to with ADMIN when
 # creating users. Note that existing users will not be modified. Roles
-# specified here must already exist in MySQL.
+# specified here must already exist in MySQL. Supported in MySQL 8+ and MariaDB 10+.
 roles_to_grant_with_admin = group3
