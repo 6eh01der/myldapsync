@@ -181,7 +181,7 @@ def main():
 
                 # It's a dry run, so just print the output
                 print('CREATE USER "%s" IDENTIFIED %s; %s %s' %
-                        (user_name, identified))
+                        (user_name, identified, user_grants, user_admin_grants))
                 print(privilege_list)
                 print(user_grants)
                 print(user_admin_grants)
@@ -195,7 +195,7 @@ def main():
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
                     cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED %s; %s %s' %
-                                   (user_name, identified))
+                                   (user_name, identified, user_grants, user_admin_grants))
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,
