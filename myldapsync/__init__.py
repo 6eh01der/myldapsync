@@ -174,14 +174,14 @@ def main():
             user_name = user.replace('\'', '\\\'')
             user_grants = get_user_grants(config, user_name)
             user_admin_grants = get_user_grants(config, user_name, True)
-            privilege_list = get_user_attributes(config,
+            privilege_list = get_user_privileges(config,
                                                  (user in ldap_admin_users))
 
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE USER "%s" IDENTIFIED %s; %s %s' %
-                        (user_name, identified, user_grants, user_admin_grants))
+                print('CREATE USER "%s" IDENTIFIED %s; %s %s %s' %
+                        (user_name, identified, privilege_list, user_grants, user_admin_grants))
                 print(privilege_list)
                 print(user_grants)
                 print(user_admin_grants)
@@ -194,8 +194,8 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED %s; %s %s' %
-                                   (user_name, identified, user_grants, user_admin_grants))
+                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED %s; %s %s %s' %
+                                   (user_name, identified, privilege_list, user_grants, user_admin_grants))
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,

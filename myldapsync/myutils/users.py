@@ -75,7 +75,10 @@ def get_user_privileges(config, admin):
     Returns:
         str: A SQL snippet listing the user privileges
     """
+
     privilege_list = ''
+    sql = ''
+
     if config.getboolean('general', 'user_privilege_all') or admin:
         privilege_list = privilege_list + 'ALL' + ', '
 
@@ -118,7 +121,11 @@ def get_user_privileges(config, admin):
     if privilege_list.endswith(', '):
         privilege_list = privilege_list[:-2]
 
-    return privilege_list
+    if privilege_list != '':
+        sql = 'GRANT %s ON *.* TO "%s"' % (privilege_list, user)
+        sql = sql + ';'
+
+    return sql
 
 
 def get_user_grants(config, user, with_admin=False):
@@ -149,7 +156,7 @@ def get_user_grants(config, user, with_admin=False):
         roles = roles[:-2]
 
     if roles != '':
-        sql = 'GRANT "%s" TO "%s"' % (roles, user)
+        sql = 'GRANT %s TO "%s"' % (roles, user)
 
         if with_admin:
             sql = sql + " WITH ADMIN OPTION"
