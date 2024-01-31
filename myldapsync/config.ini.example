@@ -94,8 +94,11 @@ add_ldap_users_to_mysql = true
 # Remove MySQL users if they don't exist in LDAP, or ignore them?
 remove_users_from_mysql = true
 
-# Global privileges to grant to users in MySQL.
-# "Global" means that it will be privileges for all databases - GRANT SOME_PRIVILEGE ON *.* ...
+# Database for privileges granting. If empty privileges will be granted for everything i.e. *.*.
+# Wildcard could be used like "db%" so grants will be applied for every database with "db" name prefix.
+database =
+
+# Privileges to grant to users in MySQL.
 # Note these privileges are only applied to users when created. Existing users are unaffected.
 user_privilege_all = false
 user_privilege_create = false

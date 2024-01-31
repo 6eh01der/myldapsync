@@ -174,7 +174,7 @@ def main():
             user_name = user.replace('\'', '\\\'')
             user_grants = get_user_grants(config, user_name)
             user_admin_grants = get_user_grants(config, user_name, True)
-            privilege_list = get_user_privileges(config,
+            privilege_list = get_user_privileges(config, user_name,
                                                  (user in ldap_admin_users))
 
             if args.dry_run:

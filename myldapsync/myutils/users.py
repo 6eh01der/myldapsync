@@ -66,7 +66,7 @@ def get_filtered_my_users(config, conn):
     return users
 
 
-def get_user_privileges(config, admin):
+def get_user_privileges(config, user, admin):
     """Generate a list of user privileges to use when creating users
 
     Args:
@@ -78,6 +78,12 @@ def get_user_privileges(config, admin):
 
     privilege_list = ''
     sql = ''
+
+    if config.get('general', 'database') != '':
+        database = config.get('general', 'database')
+        database = '`' + database + '`'
+    else:
+        database = '*'
 
     if config.getboolean('general', 'user_privilege_all') or admin:
         privilege_list = privilege_list + 'ALL' + ', '
@@ -122,7 +128,7 @@ def get_user_privileges(config, admin):
         privilege_list = privilege_list[:-2]
 
     if privilege_list != '':
-        sql = 'GRANT %s ON *.* TO "%s"' % (privilege_list, user)
+        sql = 'GRANT %s ON %s.* TO "%s"' % (privilege_list, database, user)
         sql = sql + ';'
 
     return sql
