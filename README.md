@@ -1,4 +1,4 @@
-# myldapsync - adopted for MySQL and MariaDB fork of pgldapsync by EnterpriseDB Corporation (work in progress)
+# myldapsync - fork of pgldapsync by EnterpriseDB Corporation adopted for MySQL and MariaDB fork of pgldapsync by EnterpriseDB Corporation (work in progress)
 # pgldapsync - https://github.com/EnterpriseDB/pgldapsync
 
 This Python module allows you to synchronise MySQL or MariaDB users
