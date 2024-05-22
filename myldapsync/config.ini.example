@@ -76,6 +76,14 @@ server_connstr = hostaddr=127.0.0.1 port=3306 dbname=mysql user=root
 # A comma delimited list of users to ignore
 ignore_users = root
 
+# Connection parameters
+host = localhost
+db = mysql
+user = root
+password = 
+use_pure = True
+auth_plugin = mysql_clear_password
+
 ##########################################################################
 # General configuration
 ##########################################################################

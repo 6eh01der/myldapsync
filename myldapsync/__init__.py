@@ -18,7 +18,6 @@ import configparser
 
 from myldapsync.ldaputils.connection import connect_ldap_server
 from myldapsync.ldaputils.users import *
-from myldapsync.myutils.connection import connect_my_server
 from myldapsync.myutils.users import *
 
 
@@ -85,6 +84,16 @@ def main():
     # Read the config file
     config = read_config(args.config)
 
+    # MySQL connection dictionary
+    connection_string_params = {
+        "host": config.get('mysql', 'host'),
+        "user": config.get('mysql', 'user'),
+        "password": config.get('mysql', 'password'),
+        "db": config.get('mysql', 'db'),
+        "use_pure": config.get('mysql', 'use_pure'),
+        "auth_plugin": config.get('mysql', 'auth_plugin')
+        }
+
     # Connect to LDAP and get the users we care about
     ldap_conn = connect_ldap_server(config)
     if ldap_conn is None:
@@ -92,11 +101,6 @@ def main():
 
     ldap_users = get_filtered_ldap_users(config, ldap_conn, False)
     if ldap_users is None:
-        sys.exit(1)
-
-    # Get ldap base dn and search filter
-    ldap_conf = get_ldap_conf(config, False)
-    if ldap_conf is None:
         sys.exit(1)
 
     # Get the LDAP admin users, if the base DN and filter are configured
@@ -109,7 +113,7 @@ def main():
         sys.exit(1)
 
     # Connect to MySQL and get the users we care about
-    my_conn = connect_my_server(config.get('mysql', 'server_connstr'))
+    my_conn = mysql.connector.connect(**connection_string_params)
     if my_conn is None:
         sys.exit(1)
 
