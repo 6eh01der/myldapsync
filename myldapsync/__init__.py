@@ -124,7 +124,7 @@ def main():
     # Compare the LDAP and MySQL users and get the lists of users
     # to add and drop.
     users_to_create = get_create_users(ldap_users, my_users)
-    users_to_drop = get_drop_lusers(ldap_users, my_users)
+    users_to_drop = get_drop_users(ldap_users, my_users)
 
     # Create/drop users if required
     have_work = ((config.getboolean('general',
