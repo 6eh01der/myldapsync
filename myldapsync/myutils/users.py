@@ -202,7 +202,7 @@ def get_drop_users(ldap_users, my_users):
     """
     users = []
 
-    for users in my_users:
+    for user in my_users:
         if user not in ldap_users:
             users.append(user)
 

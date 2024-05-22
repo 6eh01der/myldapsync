@@ -212,11 +212,13 @@ def main():
 
         # For each user to drop, just run the DROP statement
         for user in users_to_drop:
+            
+            user_name = user.decode("utf-8").replace('\'', '\\\'')
 
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('DROP USER "%s";' % user.replace('\'', '\\\''))
+                print('DROP USER "%s";' % user_name)
             else:
 
                 # This is a live run, so directly execute the SQL generated.
@@ -227,7 +229,7 @@ def main():
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
                     cur.execute('SAVEPOINT dr; DROP USER "%s";' %
-                                user.replace('\'', '\\\''))
+                                user_name)
                     users_dropped = users_dropped + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error dropping user %s: %s" % (user,
