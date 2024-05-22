@@ -213,7 +213,7 @@ def main():
         # For each user to drop, just run the DROP statement
         for user in users_to_drop:
             
-            user_name = user.decode("utf-8").replace('\'', '\\\'')
+            user_name = user.replace('\'', '\\\'')
 
             if args.dry_run:
 

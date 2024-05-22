@@ -39,6 +39,8 @@ def get_my_users(conn):
 
     cur.close()
 
+    users = [x.decode('UTF8') for x in users]
+
     return users
 
 
@@ -59,7 +61,7 @@ def get_filtered_my_users(config, conn):
     # Remove ignored users
     for user in config.get('mysql', 'ignore_users').split(','):
         try:
-            users.remove(user)
+            users = [members for members in users if user not in members]
         except ValueError:
             pass
 
