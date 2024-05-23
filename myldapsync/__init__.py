@@ -90,7 +90,6 @@ def main():
         "user": config.get('mysql', 'user'),
         "password": config.get('mysql', 'password'),
         "db": config.get('mysql', 'db'),
-        "use_pure": config.get('mysql', 'use_pure'),
         "auth_plugin": config.get('mysql', 'auth_plugin')
         }
 
