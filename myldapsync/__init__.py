@@ -185,9 +185,6 @@ def main():
                 # It's a dry run, so just print the output
                 print('CREATE USER "%s" IDENTIFIED %s; %s %s %s' %
                         (user_name, identified, privilege_list, user_grants, user_admin_grants))
-                print(privilege_list)
-                print(user_grants)
-                print(user_admin_grants)
             else:
 
                 # This is a live run, so directly execute the SQL generated.
