@@ -61,7 +61,7 @@ def get_filtered_my_users(config, conn):
     # Remove ignored users
     for user in config.get('mysql', 'ignore_users').split(','):
         try:
-            users = [members for members in users if user not in members]
+            users = [members for members in users if user != members]
         except ValueError:
             pass
 
