@@ -1,4 +1,3 @@
 [MESSAGES CONTROL]
 
-disable=C0209
-disable=R0912
+disable=C0209,R0912
