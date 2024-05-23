@@ -159,7 +159,7 @@ def main():
     if auth_plugin == 'simple':
         identified = 'WITH authentication_ldap_simple'
     elif auth_plugin == 'sasl':
-        identified = 'WITH authentication_ldap_sasl'   
+        identified = 'WITH authentication_ldap_sasl'
     elif auth_plugin == 'pam':
         dbms = config.get('general', 'dbms')
         if dbms == 'mysql':

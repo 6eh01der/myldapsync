@@ -10,7 +10,6 @@
 
 import sys
 
-import ast
 import mysql.connector
 
 
@@ -25,7 +24,10 @@ def get_my_users(conn):
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT user FROM mysql.user WHERE account_locked='N' AND password_expired='N' AND authentication_string IS NOT NULL;")
+        cur.execute("SELECT user FROM mysql.user\n"
+        "WHERE account_locked='N'\n"
+        "AND password_expired='N'\n"
+        "AND authentication_string IS NOT NULL;")
         rows = cur.fetchall()
     except mysql.connector.Error as exception:
         sys.stderr.write("Error retrieving MySQL users: %s\n" %

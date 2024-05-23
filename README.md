@@ -42,7 +42,7 @@ be executed to stdout), run it like this:
 ## Creating a virtual environment for dev/test
 
     python3 -m venv /path/to/myldapsync
-    source /path/to/myldapsync/bin/activate.sh
+    source /path/to/myldapsync/bin/activate
     pip install -r requirements.txt
     
 Adapt the first command as required for your environment/Python
