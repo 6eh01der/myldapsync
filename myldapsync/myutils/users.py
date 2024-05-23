@@ -68,12 +68,14 @@ def get_filtered_my_users(config, conn):
     return users
 
 
-def get_user_privileges(config, user, admin):
+def get_user_privileges(config, user, with_admin=False):
     """Generate a list of user privileges to use when creating users
 
     Args:
         config (ConfigParser): The application configuration
-        admin (bool): Should the user be a superuser regardless of the config?
+        user (str): The user name to be granted privileges
+        with_admin (bool): Generate a list of privileges that will have the WITH
+            GRANT OPTION specified, if True
     Returns:
         str: A SQL snippet listing the user privileges
     """
@@ -87,50 +89,52 @@ def get_user_privileges(config, user, admin):
     else:
         database = '*'
 
-    if config.getboolean('general', 'user_privilege_all') or admin:
+    if config.getboolean('general', 'user_privilege_all') or with_admin:
         privilege_list = privilege_list + 'ALL' + ', '
+    else:
+        if config.getboolean('general', 'user_privilege_create'):
+            privilege_list = privilege_list + 'CREATE'+ ', '
 
-    if config.getboolean('general', 'user_privilege_create'):
-        privilege_list = privilege_list + 'CREATE'+ ', '
+        if config.getboolean('general', 'user_privilege_create_role'):
+            privilege_list = privilege_list + 'CREATE ROLE'+ ', '
 
-    if config.getboolean('general', 'user_privilege_create_role'):
-        privilege_list = privilege_list + 'CREATE ROLE'+ ', '
+        if config.getboolean('general', 'user_privilege_alter'):
+            privilege_list = privilege_list + 'CREATE, INSERT, ALTER'+ ', '
 
-    if config.getboolean('general', 'user_privilege_alter'):
-        privilege_list = privilege_list + 'CREATE, INSERT, ALTER'+ ', '
+        if config.getboolean('general', 'user_privilege_create_user'):
+            privilege_list = privilege_list + 'CREATE USER'+ ', '
 
-    if config.getboolean('general', 'user_privilege_create_user'):
-        privilege_list = privilege_list + 'CREATE USER'+ ', '
+        if config.getboolean('general', 'user_privilege_alter_rename'):
+            privilege_list = privilege_list + 'CREATE, INSERT, ALTER, DROP'+ ', '
 
-    if config.getboolean('general', 'user_privilege_alter_rename'):
-        privilege_list = privilege_list + 'CREATE, INSERT, ALTER, DROP'+ ', '
+        if config.getboolean('general', 'user_privilege_event'):
+            privilege_list = privilege_list + 'EVENT'+ ', '
 
-    if config.getboolean('general', 'user_privilege_event'):
-        privilege_list = privilege_list + 'EVENT'+ ', '
+        if config.getboolean('general', 'user_privilege_execute'):
+            privilege_list = privilege_list + 'EXECUTE'+ ', '
 
-    if config.getboolean('general', 'user_privilege_execute'):
-        privilege_list = privilege_list + 'EXECUTE'+ ', '
+        if config.getboolean('general', 'user_privilege_trigger'):
+            privilege_list = privilege_list + 'TRIGGER'+ ', '
 
-    if config.getboolean('general', 'user_privilege_trigger'):
-        privilege_list = privilege_list + 'TRIGGER'+ ', '
+        if config.getboolean('general', 'user_privilege_INSERT'):
+            privilege_list = privilege_list + 'INSERT'+ ', '
 
-    if config.getboolean('general', 'user_privilege_INSERT'):
-        privilege_list = privilege_list + 'INSERT'+ ', '
+        if config.getboolean('general', 'user_privilege_UPDATE'):
+            privilege_list = privilege_list + 'UPDATE'+ ', '
 
-    if config.getboolean('general', 'user_privilege_UPDATE'):
-        privilege_list = privilege_list + 'UPDATE'+ ', '
+        if config.getboolean('general', 'user_privilege_DELETE'):
+            privilege_list = privilege_list + 'DELETE'+ ', '
 
-    if config.getboolean('general', 'user_privilege_DELETE'):
-        privilege_list = privilege_list + 'DELETE'+ ', '
-
-    if config.getboolean('general', 'user_privilege_DROP'):
-        privilege_list = privilege_list + 'DROP'+ ', '
+        if config.getboolean('general', 'user_privilege_DROP'):
+            privilege_list = privilege_list + 'DROP'+ ', '
 
     if privilege_list.endswith(', '):
         privilege_list = privilege_list[:-2]
 
     if privilege_list != '':
         sql = 'GRANT %s ON %s.* TO "%s"' % (privilege_list, database, user)
+        if with_admin:
+            sql = sql + " WITH GRANT OPTION"
         sql = sql + ';'
 
     return sql
@@ -142,11 +146,11 @@ def get_user_grants(config, user, with_admin=False):
 
     Args:
         config (ConfigParser): The application configuration
-        user (str): The user name to be granted additional roles
+        user (str): The user name to be granted roles
         with_admin (bool): Generate a list of roles that will have the WITH
             ADMIN OPTION specified, if True
     Returns:
-        str: A SQL snippet listing the user GRANT statements required
+        str: A SQL snippet listing the user roles
     """
     roles = ''
     sql = ''

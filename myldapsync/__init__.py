@@ -149,10 +149,10 @@ def main():
 
         # Begin the transaction
         if args.dry_run:
-            print("BEGIN;")
+            print("START TRANSACTION;")
         else:
             cur = my_conn.cursor()
-            cur.execute("BEGIN;")
+            cur.execute("START TRANSACTION;")
 
     # Set authentication plugin
     auth_plugin = config.get('general', 'auth_plugin')
@@ -176,7 +176,8 @@ def main():
         for user in users_to_create:
             user_name = user.replace('\'', '\\\'')
             user_grants = get_user_grants(config, user_name)
-            user_admin_grants = get_user_grants(config, user_name, True)
+            user_admin_grants = get_user_grants(config, user_name,
+                                                 (user in ldap_admin_users))
             privilege_list = get_user_privileges(config, user_name,
                                                  (user in ldap_admin_users))
 
@@ -194,21 +195,24 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT cr; CREATE USER "%s" IDENTIFIED %s; %s %s %s' %
-                                   (user_name, identified, privilege_list, user_grants, user_admin_grants))
+                    cur.execute('CREATE USER "%s" IDENTIFIED %s;' %
+                                   (user_name, identified))
+                    cur.execute('%s' % privilege_list)
+                    cur.execute('%s' % user_grants)
+                    cur.execute('%s' % user_admin_grants)
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,
                                                                      exception))
                     users_add_errors = users_add_errors + 1
-                    cur.execute('ROLLBACK TO SAVEPOINT cr;')
+                    cur.execute('ROLLBACK;')
 
     # If we need to drop users from MySQL, then do so
     if config.getboolean('general', 'remove_users_from_mysql'):
 
         # For each user to drop, just run the DROP statement
         for user in users_to_drop:
-            
+
             user_name = user.replace('\'', '\\\'')
 
             if args.dry_run:
@@ -224,14 +228,13 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('SAVEPOINT dr; DROP USER "%s";' %
-                                user_name)
+                    cur.execute('DROP USER "%s";' % user_name)
                     users_dropped = users_dropped + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error dropping user %s: %s" % (user,
                                                                      exception))
                     users_drop_errors = users_drop_errors + 1
-                    cur.execute('ROLLBACK TO SAVEPOINT dr;')
+                    cur.execute('ROLLBACK;')
 
     if have_work:
 
