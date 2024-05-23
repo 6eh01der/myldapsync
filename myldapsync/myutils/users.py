@@ -157,8 +157,9 @@ def get_user_grants(config, user, with_admin=False):
     else:
         roles_to_grant = config.get('general', 'roles_to_grant').split(',')
 
-    for role_to_grant in roles_to_grant:
-        roles = roles + '"' + role_to_grant + '", '
+    if roles_to_grant != ['']:
+        for role_to_grant in roles_to_grant:
+            roles = roles + '"' + role_to_grant + '", '
 
     if roles.endswith(', '):
         roles = roles[:-2]
