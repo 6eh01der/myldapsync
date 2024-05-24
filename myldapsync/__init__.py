@@ -165,7 +165,11 @@ def main():
         if dbms == 'mysql':
             identified = 'WITH authentication_pam'
         elif dbms == 'psms':
-            identified = 'WITH auth_pam'
+            compat = config.get('general', 'compat')
+            if compat:
+                identified = 'WITH auth_pam_compat'
+            else:
+                identified = 'WITH auth_pam'
         elif dbms == 'mariadb':
             identified = 'VIA pam'
 

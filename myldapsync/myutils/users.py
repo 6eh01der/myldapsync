@@ -118,16 +118,16 @@ def get_user_privileges(config, user, with_admin=False):
         if config.getboolean('general', 'user_privilege_trigger'):
             privilege_list = privilege_list + 'TRIGGER'+ ', '
 
-        if config.getboolean('general', 'user_privilege_INSERT'):
+        if config.getboolean('general', 'user_privilege_insert'):
             privilege_list = privilege_list + 'INSERT'+ ', '
 
-        if config.getboolean('general', 'user_privilege_UPDATE'):
+        if config.getboolean('general', 'user_privilege_update'):
             privilege_list = privilege_list + 'UPDATE'+ ', '
 
-        if config.getboolean('general', 'user_privilege_DELETE'):
+        if config.getboolean('general', 'user_privilege_delete'):
             privilege_list = privilege_list + 'DELETE'+ ', '
 
-        if config.getboolean('general', 'user_privilege_DROP'):
+        if config.getboolean('general', 'user_privilege_drop'):
             privilege_list = privilege_list + 'DROP'+ ', '
 
     if privilege_list.endswith(', '):
