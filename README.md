@@ -1,5 +1,4 @@
-# myldapsync - fork of pgldapsync by EnterpriseDB Corporation adopted for MySQL and MariaDB fork of pgldapsync by EnterpriseDB Corporation
-# pgldapsync - https://github.com/EnterpriseDB/pgldapsync
+# myldapsync - fork of [pgldapsync](https://github.com/EnterpriseDB/pgldapsync) by EnterpriseDB Corporation adopted for MySQL and MariaDB fork of pgldapsync by EnterpriseDB Corporation
 
 This Python module allows you to synchronise MySQL or MariaDB users
 with users in an LDAP directory.
