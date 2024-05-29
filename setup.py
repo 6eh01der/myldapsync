@@ -22,7 +22,7 @@ setuptools.setup(
     version="1.0.2",
     author="Artur Lebedev",
     author_email="ras_atari@mail.ru",
-    description="Synchronise LDAP users to MySQL",
+    description="Synchronise LDAP users to MySQL and MariaDB",
     license='MySQL',
     long_description=long_description,
     long_description_content_type="text/markdown",
