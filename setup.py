@@ -19,7 +19,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name="myldapsync",
-    version="1.0.1",
+    version="1.0.2",
     author="Artur Lebedev",
     author_email="ras_atari@mail.ru",
     description="Synchronise LDAP users to MySQL",
@@ -37,7 +37,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        "License :: OSI Approved :: MySQL License",
+        "License :: OSI Approved :: GNU General",
         "Operating System :: OS Independent",
     ],
     entry_points={

@@ -63,6 +63,11 @@ username_attribute = uid
 # A command delimited list of users to ignore
 ignore_users = Manager,ldap.sync
 
+# Kerberos authentication parameters
+use_kerberos =
+SERVICE_NAME =
+LDAP_SERVER_IP =
+
 
 ##########################################################################
 # MySQL access configuration
@@ -79,6 +84,13 @@ db = mysql
 user = root
 password = 
 auth_plugin = mysql_native_password
+ssl_ca =
+ssl_cert =
+ssl_key =
+ssl_verify_identity =
+ssl_verify_cert =
+use_pure =
+SERVICE_NAME =
 
 ##########################################################################
 # General configuration

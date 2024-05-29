@@ -41,8 +41,6 @@ def get_my_users(conn):
 
     cur.close()
 
-    users = [x.decode('UTF8') for x in users]
-
     return users
 
 

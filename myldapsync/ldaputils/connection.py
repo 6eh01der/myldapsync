@@ -14,9 +14,10 @@
 import ssl
 import sys
 
-from ldap3 import Connection, Server, Tls
+from ldap3 import Connection, Server, Tls, SASL, KERBEROS
 from ldap3.core.exceptions import LDAPBindError, LDAPSocketOpenError, \
-    LDAPStartTLSError
+    LDAPStartTLSError, LDAPSASLBindInProgressError, LDAPSASLPrepError, \
+    LDAPSASLMechanismNotSupportedError
 
 
 try:
@@ -77,8 +78,16 @@ def connect_ldap_server(config):
     # Create the connection
     conn = None
     try:
-        if config.get('ldap', 'bind_username') == '':
+        if config.get('ldap', 'bind_username') == '' and config.get('ldap', 'use_krb') == '':
             conn = Connection(server, auto_bind=True)
+        elif config.get('ldap', 'use_krb') != '':
+            if config.get('ldap', 'SERVICE_NAME') != '' and config.get('ldap', 'LDAP_SERVER_IP') != '':
+                SERVICE_NAME = config.get('ldap', 'SERVICE_NAME')
+                LDAP_SERVER_IP = config.get('ldap', 'LDAP_SERVER_IP')
+                SPN = f"{SERVICE_NAME}/{LDAP_SERVER_IP}"
+                conn = Connection(server, user=SPN, authentication=SASL, sasl_mechanism=KERBEROS)
+            else:
+                conn = Connection(server, authentication=SASL, sasl_mechanism=KERBEROS)
         else:
             conn = Connection(server,
                               config.get('ldap', 'bind_username'),
@@ -89,6 +98,15 @@ def connect_ldap_server(config):
                          exception)
     except LDAPBindError as exception:
         sys.stderr.write("Error binding to the LDAP server: %s\n" % exception)
+
+    except LDAPSASLBindInProgressError as exception:
+        sys.stderr.write("SASL bind in progress error: %s\n" % exception)
+
+    except LDAPSASLPrepError as exception:
+        sys.stderr.write("SASL prep error: %s\n" % exception)
+
+    except LDAPSASLMechanismNotSupportedError as exception:
+        sys.stderr.write("SASL mechanism not supported error: %s\n" % exception)
 
     # Debug
     if config.getboolean('ldap', 'debug'):
