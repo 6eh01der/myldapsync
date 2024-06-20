@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-################################################################################
+###########################################################################################
 #
-# myldapsync - adopted for MySQL fork of pgldapsync by EnterpriseDB Corporation
+# myldapsync - fork of pgldapsync by EnterpriseDB Corporation adopted for MySQL and MariaDB
 #
 # Synchronise MySQL users with users in an LDAP directory.
 #
-################################################################################
+###########################################################################################
 
 # -*- coding: utf-8 -*-
 
