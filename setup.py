@@ -29,10 +29,9 @@ setuptools.setup(
     url="https://github.com/6eh01der/myldapsync",
     packages=setuptools.find_packages(),
     install_requires=required,
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',

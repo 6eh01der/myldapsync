@@ -21,7 +21,7 @@ MariaDB:
 
 https://mariadb.com/kb/en/authentication-plugin-pam/
 
-*myldapsync is supported on Python 3.7 or later.*
+*myldapsync is supported on Python 3.8 or later.*
 
 In order to use it, you will need to create a _config.ini_ 
 file containing the site-specific configuration you require. 

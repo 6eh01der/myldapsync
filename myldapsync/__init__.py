@@ -87,42 +87,40 @@ def main():
     # MySQL connection dictionary
     connection_string_params = {}
 
-    if config.get('mysql', 'host') != '':
-        connection_string_params = dict(connection_string_params, host=config.get('mysql', 'host'))
+    if (host := config.get('mysql', 'host')) != '':
+        connection_string_params = dict(connection_string_params, host=host)
 
-    if config.get('mysql', 'user') != '':
-        connection_string_params = dict(connection_string_params, user=config.get('mysql', 'user'))
+    if (user := config.get('mysql', 'user')) != '':
+        connection_string_params = dict(connection_string_params, user=user)
 
-    if config.get('mysql', 'password') != '':
-        connection_string_params = dict(connection_string_params, password=config.get('mysql', 'password'))
+    if (password := config.get('mysql', 'password')) != '':
+        connection_string_params = dict(connection_string_params, password=password)
 
-    if config.get('mysql', 'db') != '':
-        connection_string_params = dict(connection_string_params, db=config.get('mysql', 'db'))
+    if (db := config.get('mysql', 'db')) != '':
+        connection_string_params = dict(connection_string_params, db=db)
 
-    if config.get('mysql', 'auth_plugin') != '':
-        connection_string_params = dict(connection_string_params, auth_plugin=config.get('mysql', 'auth_plugin'))
+    if (auth_plugin := config.get('mysql', 'auth_plugin')) != '':
+        connection_string_params = dict(connection_string_params, auth_plugin=auth_plugin)
 
-    if config.get('mysql', 'ssl_ca') != '':
-        connection_string_params = dict(connection_string_params, ssl_ca=config.get('mysql', 'ssl_ca'))
+    if (ssl_ca := config.get('mysql', 'ssl_ca')) != '':
+        connection_string_params = dict(connection_string_params, ssl_ca=ssl_ca)
 
-    if config.get('mysql', 'ssl_cert') != '':
-        connection_string_params = dict(connection_string_params, ssl_cert=config.get('mysql', 'ssl_cert'))
+    if (ssl_cert := config.get('mysql', 'ssl_cert')) != '':
+        connection_string_params = dict(connection_string_params, ssl_cert=ssl_cert)
 
-    if config.get('mysql', 'ssl_key') != '':
-        connection_string_params = dict(connection_string_params, ssl_key=config.get('mysql', 'ssl_key'))
+    if (ssl_key := config.get('mysql', 'ssl_key')) != '':
+        connection_string_params = dict(connection_string_params, ssl_key=ssl_key)
 
-    if config.get('mysql', 'ssl_verify_identity') != '':
-        connection_string_params = dict(connection_string_params, ssl_verify_identity=config.get('mysql', 'ssl_verify_identity'))
+    if (ssl_verify_identity := config.get('mysql', 'ssl_verify_identity')) != '':
+        connection_string_params = dict(connection_string_params, ssl_verify_identity=ssl_verify_identity)
 
-    if config.get('mysql', 'ssl_verify_cert') != '':
-        connection_string_params = dict(connection_string_params, ssl_verify_cert=config.get('mysql', 'ssl_verify_cert'))
+    if (ssl_verify_cert := config.get('mysql', 'ssl_verify_cert')) != '':
+        connection_string_params = dict(connection_string_params, ssl_verify_cert=ssl_verify_cert)
 
-    if config.get('mysql', 'use_pure') != '':
-        connection_string_params = dict(connection_string_params, use_pure=config.get('mysql', 'use_pure'))
+    if (use_pure := config.get('mysql', 'use_pure')) != '':
+        connection_string_params = dict(connection_string_params, use_pure=use_pure)
 
-    if config.get('mysql', 'SERVICE_NAME') and config.get('mysql', 'LDAP_SERVER_IP') != '':
-        SERVICE_NAME = config.get('mysql', 'SERVICE_NAME')
-        LDAP_SERVER_IP = config.get('mysql', 'LDAP_SERVER_IP')
+    if (SERVICE_NAME := config.get('mysql', 'SERVICE_NAME')) and (LDAP_SERVER_IP := config.get('mysql', 'LDAP_SERVER_IP')) != '':
         connection_string_params = dict(connection_string_params, krb_service_principal=f"{SERVICE_NAME}/{LDAP_SERVER_IP}")
 
     # Connect to LDAP and get the users we care about

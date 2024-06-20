@@ -43,17 +43,20 @@ def connect_ldap_server(config):
 
     if uri.scheme == 'ldaps' or config.getboolean('ldap', 'use_starttls'):
 
-        ca_cert_file = None
-        if config.get('ldap', 'ca_cert_file') != '':
-            ca_cert_file = config.get('ldap', 'ca_cert_file')
+        if (ca_cert_file := config.get('ldap', 'ca_cert_file')) != '':
+            pass
+        else:
+            ca_cert_file = None
 
-        cert_file = None
-        if config.get('ldap', 'cert_file') != '':
-            cert_file = config.get('ldap', 'cert_file')
+        if (cert_file := config.get('ldap', 'cert_file')) != '':
+            pass
+        else:
+            cert_file = None
 
-        key_file = None
-        if config.get('ldap', 'key_file') != '':
-            key_file = config.get('ldap', 'key_file')
+        if (key_file := config.get('ldap', 'key_file')) != '':
+            pass
+        else:
+            key_file = None
 
         tls = Tls(
             local_private_key_file=key_file,
@@ -81,9 +84,7 @@ def connect_ldap_server(config):
         if config.get('ldap', 'bind_username') == '' and config.get('ldap', 'use_krb') == '':
             conn = Connection(server, auto_bind=True)
         elif config.get('ldap', 'use_krb') != '':
-            if config.get('ldap', 'SERVICE_NAME') != '' and config.get('ldap', 'LDAP_SERVER_IP') != '':
-                SERVICE_NAME = config.get('ldap', 'SERVICE_NAME')
-                LDAP_SERVER_IP = config.get('ldap', 'LDAP_SERVER_IP')
+            if (SERVICE_NAME := config.get('ldap', 'SERVICE_NAME')) and (LDAP_SERVER_IP := config.get('ldap', 'LDAP_SERVER_IP')) != '':
                 SPN = f"{SERVICE_NAME}/{LDAP_SERVER_IP}"
                 conn = Connection(server, user=SPN, authentication=SASL, sasl_mechanism=KERBEROS)
             else:

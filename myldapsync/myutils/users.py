@@ -83,8 +83,7 @@ def get_user_privileges(config, user, with_admin=False):
     privilege_list = ''
     sql = ''
 
-    if config.get('general', 'database') != '':
-        database = config.get('general', 'database')
+    if (database := config.get('general', 'database')) != '':
         database = '`' + database + '`'
     else:
         database = '*'
