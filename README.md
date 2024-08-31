@@ -52,4 +52,4 @@ version.
 To create a package (wheel), run the following in your virtual 
 environment:
 
-    python3 setup.py sdist bdist_wheel --universal
+    python3 setup.py sdist bdist_wheel
