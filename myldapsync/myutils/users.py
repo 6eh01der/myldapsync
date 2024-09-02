@@ -68,13 +68,13 @@ def get_filtered_my_users(config, conn):
     return users
 
 
-def get_user_privileges(config, user, with_admin=False):
+def get_user_privileges(config, user, with_grant=False):
     """Generate a list of user privileges to use when creating users
 
     Args:
         config (ConfigParser): The application configuration
         user (str): The user name to be granted privileges
-        with_admin (bool): Generate a list of privileges that will have the WITH
+        with_grant (bool): Generate a list of privileges that will have the WITH
             GRANT OPTION specified, if True
     Returns:
         str: A SQL snippet listing the user privileges
@@ -88,7 +88,7 @@ def get_user_privileges(config, user, with_admin=False):
     else:
         database = '*'
 
-    if config.getboolean('general', 'user_privilege_all') or with_admin:
+    if config.getboolean('general', 'user_privilege_all') or with_grant:
         privilege_list = privilege_list + 'ALL' + ', '
     else:
         if config.getboolean('general', 'user_privilege_create'):
@@ -132,7 +132,7 @@ def get_user_privileges(config, user, with_admin=False):
 
     if privilege_list != '':
         sql = 'GRANT %s ON %s.* TO "%s"' % (privilege_list, database, user)
-        if with_admin:
+        if with_grant:
             sql = sql + " WITH GRANT OPTION"
         sql = sql + ';'
 

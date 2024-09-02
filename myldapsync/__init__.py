@@ -234,6 +234,8 @@ def main():
                     cur.execute('%s' % privilege_list)
                     cur.execute('%s' % user_grants)
                     cur.execute('%s' % user_admin_grants)
+                    if (filter_string := config.get('mysql', 'filter_string')) == '(objectClass=group)':
+                        cur.execute('GRANT PROXY ON "%s" TO ''@'';' % user_name)
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,
