@@ -127,12 +127,10 @@ def main():
         krb_service_principal=f"{service_name}/{ldap_server_ip}")
 
     # Connect to LDAP and get the users we care about
-    ldap_conn = connect_ldap_server(config)
-    if ldap_conn is None:
+    if (ldap_conn := connect_ldap_server(config)) is None:
         sys.exit(1)
 
-    ldap_users = get_filtered_ldap_users(config, ldap_conn, False)
-    if ldap_users is None:
+    if (ldap_users := get_filtered_ldap_users(config, ldap_conn, False)) is None:
         sys.exit(1)
 
     # Get the LDAP admin users, if the base DN and filter are configured
@@ -145,12 +143,10 @@ def main():
         sys.exit(1)
 
     # Connect to MySQL and get the users we care about
-    my_conn = mysql.connector.connect(**connection_string_params)
-    if my_conn is None:
+    if (my_conn := mysql.connector.connect(**connection_string_params)) is None:
         sys.exit(1)
 
-    my_users = get_filtered_my_users(config, my_conn)
-    if my_users is None:
+    if (my_users := get_filtered_my_users(config, my_conn)) is None:
         sys.exit(1)
 
     # Compare the LDAP and MySQL users and get the lists of users
@@ -188,23 +184,26 @@ def main():
             cur.execute("START TRANSACTION;")
 
     # Set authentication plugin
-    auth_plugin = config.get('general', 'auth_plugin')
-    if auth_plugin == 'simple':
-        identified = 'WITH authentication_ldap_simple'
-    elif auth_plugin == 'sasl':
-        identified = 'WITH authentication_ldap_sasl'
-    elif auth_plugin == 'pam':
-        dbms = config.get('general', 'dbms')
-        if dbms == 'mysql':
-            identified = 'WITH authentication_pam'
-        elif dbms == 'psms':
-            compat = config.get('general', 'compat')
-            if compat:
-                identified = 'WITH auth_pam_compat'
-            else:
-                identified = 'WITH auth_pam'
-        elif dbms == 'mariadb':
-            identified = 'VIA pam'
+    identified = ''
+    if (auth_plugin := config.get('general', 'auth_plugin')) != '':
+        if auth_plugin == 'simple':
+            identified = 'WITH authentication_ldap_simple'
+        elif auth_plugin == 'sasl':
+            identified = 'WITH authentication_ldap_sasl'
+        elif auth_plugin == 'pam':
+            dbms = config.get('general', 'dbms')
+            if dbms == 'mysql':
+                identified = 'WITH authentication_pam'
+            elif dbms == 'psms':
+                compat = config.get('general', 'compat')
+                if compat:
+                    identified = 'WITH auth_pam_compat'
+                else:
+                    identified = 'WITH auth_pam'
+            elif dbms == 'mariadb':
+                identified = 'VIA pam'
+    else:
+        sys.exit(1)
 
     # If we need to add users to MySQL, then do so
     if config.getboolean('general', 'add_ldap_users_to_mysql'):
