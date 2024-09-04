@@ -88,7 +88,7 @@ def get_user_privileges(config, user, with_grant=False):
     else:
         database = '*'
 
-    if config.getboolean('general', 'user_privilege_all') or with_grant:
+    if config.getboolean('general', 'user_privilege_all'):
         privilege_list = privilege_list + 'ALL' + ', '
     else:
         if config.getboolean('general', 'user_privilege_create'):
