@@ -19,7 +19,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name="myldapsync",
-    version="1.0.7",
+    version="1.0.8",
     author="Artur Lebedev",
     author_email="ras_atari@mail.ru",
     description="Synchronise LDAP users to MySQL and MariaDB",

@@ -66,8 +66,7 @@ def get_filtered_ldap_users(config, conn, admin):
     Returns:
         str[]: A filtered list of user names
     """
-    users = get_ldap_users(config, conn, admin)
-    if users is None:
+    if (users := get_ldap_users(config, conn, admin)) is None:
         return None
 
     # Remove ignored users

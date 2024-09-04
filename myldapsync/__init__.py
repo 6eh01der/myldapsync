@@ -184,8 +184,8 @@ def main():
             cur.execute("START TRANSACTION;")
 
     # Set authentication plugin
-    identified = ''
     if (auth_plugin := config.get('general', 'auth_plugin')) != '':
+        identified = ''
         if auth_plugin == 'simple':
             identified = 'WITH authentication_ldap_simple'
         elif auth_plugin == 'sasl':

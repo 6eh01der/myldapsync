@@ -54,8 +54,7 @@ def get_filtered_my_users(config, conn):
     Returns:
         str[]: A filtered list of users
     """
-    users = get_my_users(conn)
-    if users is None:
+    if (users := get_my_users(conn)) is None:
         return None
 
     # Remove ignored users
