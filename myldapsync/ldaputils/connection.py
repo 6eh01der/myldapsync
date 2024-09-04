@@ -84,7 +84,8 @@ def connect_ldap_server(config):
         if config.get('ldap', 'bind_username') == '' and config.get('ldap', 'use_krb') == '':
             conn = Connection(server, auto_bind=True)
         elif config.get('ldap', 'use_krb') != '':
-            if (service_name := config.get('ldap', 'SERVICE_NAME')) and (ldap_server_ip := config.get('ldap', 'LDAP_SERVER_IP')) != '':
+            if (service_name := config.get('ldap', 'SERVICE_NAME')) and \
+                (ldap_server_ip := config.get('ldap', 'LDAP_SERVER_IP')) != '':
                 spn = f"{service_name}/{ldap_server_ip}"
                 conn = Connection(server, user=spn, authentication=SASL, sasl_mechanism=KERBEROS)
             else:

@@ -112,7 +112,8 @@ def main():
         connection_string_params = dict(connection_string_params, ssl_key=ssl_key)
 
     if (ssl_verify_identity := config.get('mysql', 'ssl_verify_identity')) != '':
-        connection_string_params = dict(connection_string_params, ssl_verify_identity=ssl_verify_identity)
+        connection_string_params = dict(connection_string_params,
+        ssl_verify_identity=ssl_verify_identity)
 
     if (ssl_verify_cert := config.get('mysql', 'ssl_verify_cert')) != '':
         connection_string_params = dict(connection_string_params, ssl_verify_cert=ssl_verify_cert)
@@ -120,8 +121,10 @@ def main():
     if (use_pure := config.get('mysql', 'use_pure')) != '':
         connection_string_params = dict(connection_string_params, use_pure=use_pure)
 
-    if (service_name := config.get('mysql', 'SERVICE_NAME')) and (ldap_server_ip := config.get('mysql', 'LDAP_SERVER_IP')) != '':
-        connection_string_params = dict(connection_string_params, krb_service_principal=f"{service_name}/{ldap_server_ip}")
+    if (service_name := config.get('mysql', 'SERVICE_NAME')) and \
+       (ldap_server_ip := config.get('mysql', 'LDAP_SERVER_IP')) != '':
+        connection_string_params = dict(connection_string_params,
+        krb_service_principal=f"{service_name}/{ldap_server_ip}")
 
     # Connect to LDAP and get the users we care about
     ldap_conn = connect_ldap_server(config)
@@ -235,8 +238,9 @@ def main():
                     cur.execute('%s' % user_grants)
                     cur.execute('%s' % user_admin_grants)
                     if (filter_string := config.get('mysql', 'filter_string')) != '' and \
-                        ("(objectClass=group)" in filter_string or "(objectClass=groupOfNames)" in filter_string):
-                            cur.execute('GRANT PROXY ON "%s" TO ''@'';' % user_name)
+                       ("(objectClass=group)" in filter_string or \
+                       "(objectClass=groupOfNames)" in filter_string):
+                        cur.execute('GRANT PROXY ON "%s" TO ''@'';' % user_name)
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
                     sys.stderr.write("Error creating user %s: %s" % (user,
