@@ -120,8 +120,8 @@ def main():
     if (use_pure := config.get('mysql', 'use_pure')) != '':
         connection_string_params = dict(connection_string_params, use_pure=use_pure)
 
-    if (SERVICE_NAME := config.get('mysql', 'SERVICE_NAME')) and (LDAP_SERVER_IP := config.get('mysql', 'LDAP_SERVER_IP')) != '':
-        connection_string_params = dict(connection_string_params, krb_service_principal=f"{SERVICE_NAME}/{LDAP_SERVER_IP}")
+    if (service_name := config.get('mysql', 'SERVICE_NAME')) and (ldap_server_ip := config.get('mysql', 'LDAP_SERVER_IP')) != '':
+        connection_string_params = dict(connection_string_params, krb_service_principal=f"{service_name}/{ldap_server_ip}")
 
     # Connect to LDAP and get the users we care about
     ldap_conn = connect_ldap_server(config)
