@@ -53,7 +53,7 @@ admin_base_dn = CN=Users,dc=example,dc=com
 # for roles and privileges.
 # With AD you might use a filter
 # such as: (&(objectClass=user)(memberof=CN=MYGROUP,CN=Users,dc=example,dc=com))
-# '(objectClass=group)' or '(objectClass=groupOfNames)' should be used for groups synchronisation with AD or
+# '(objectClass=group)' or '(objectClass=groupOfNames)' should be used for groups synchronization with AD or
 # OpenLdap accordingly.
 # If, for example on OpenLDAP, your admin users are members of an alternate OU,
 # then a filter of (cn=*) may suffice.
