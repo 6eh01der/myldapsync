@@ -58,9 +58,9 @@ environment:
 
 Via pip:
 ```
-    pip install myldapsync
+pip install myldapsync
 ```
 Via pipx:
 ```
-    pipx install myldapsync
+pipx install myldapsync
 ```
