@@ -53,3 +53,11 @@ To create a package (wheel), run the following in your virtual
 environment:
 
     python3 setup.py sdist bdist_wheel
+
+## Installation from PyPI
+
+Via pip:
+    pip install myldapsync
+
+Via pipx:
+    pipx install myldapsync
