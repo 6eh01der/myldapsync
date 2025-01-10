@@ -57,7 +57,10 @@ environment:
 ## Installation from PyPI
 
 Via pip:
+```
     pip install myldapsync
-
+```
 Via pipx:
+```
     pipx install myldapsync
+```
