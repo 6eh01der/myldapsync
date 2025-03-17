@@ -54,7 +54,7 @@ environment:
 
     python3 setup.py sdist bdist_wheel
 
-## Installation from PyPI
+## Installation from [PyPI](https://pypi.org/project/myldapsync/)
 
 Via pip:
 ```
