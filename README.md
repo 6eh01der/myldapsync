@@ -1,6 +1,6 @@
 # myldapsync - fork of [pgldapsync](https://github.com/EnterpriseDB/pgldapsync) by [EnterpriseDB Corporation](https://www.enterprisedb.com/) adopted for MySQL and MariaDB
 
-This Python module allows you to synchronise MySQL or MariaDB users
+This Python module allows you to synchronize MySQL or MariaDB users
 with users in an LDAP directory.
 
 Require MySQL 8 with installed and configured simple or sasl LDAP Authentication Plugin or PAM plugin (pam also supported in MySQL 5.7 and MariaDB).
