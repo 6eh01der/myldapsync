@@ -64,3 +64,7 @@ Via pipx:
 ```
 pipx install myldapsync
 ```
+
+## Configuration
+
+Example with some annotations - https://github.com/6eh01der/myldapsync/blob/main/myldapsync/config.ini.example
