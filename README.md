@@ -42,7 +42,7 @@ be executed to stdout), run it like this:
 
     python3 -m venv /path/to/myldapsync
     source /path/to/myldapsync/bin/activate
-    pip install -r requirements.txt
+    pip install -r /path/to/myldapsync/requirements.txt
     
 Adapt the first command as required for your environment/Python
 version.
