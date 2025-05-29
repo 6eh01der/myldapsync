@@ -52,6 +52,8 @@ version.
 To create a package (wheel), run the following in your virtual 
 environment:
 
+    cd /path/to/myldapsync
+    pip install wheel
     python3 setup.py sdist bdist_wheel
 
 ## Installation from [PyPI](https://pypi.org/project/myldapsync/)
