@@ -40,13 +40,13 @@ def get_ldap_users(config, conn, admin):
                     attributes=[config.get('ldap', 'username_attribute')]
                           )
     except LDAPInvalidScopeError as exception:
-        sys.stderr.write("Error searching the LDAP directory: %s\n" % exception)
+        sys.stderr.write(f"Error searching the LDAP directory: {exception}\n")
         sys.exit(1)
     except LDAPAttributeError as exception:
-        sys.stderr.write("Error searching the LDAP directory: %s\n" % exception)
+        sys.stderr.write(f"Error searching the LDAP directory: {exception}\n")
         sys.exit(1)
     except LDAPInvalidFilterError as exception:
-        sys.stderr.write("Error searching the LDAP directory: %s\n" % exception)
+        sys.stderr.write(f"Error searching the LDAP directory: {exception}\n")
         sys.exit(1)
 
     for entry in conn.entries:

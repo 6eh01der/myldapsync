@@ -66,7 +66,7 @@ def connect_ldap_server(config):
 
     # Debug
     if config.getboolean('ldap', 'debug'):
-        sys.stderr.write("TLS/SSL configuration:   %s\n" % tls)
+        sys.stderr.write(f"TLS/SSL configuration:   {tls}\n")
 
     # Create the server object
     server = Server(uri.hostname,
@@ -76,7 +76,7 @@ def connect_ldap_server(config):
 
     # Debug
     if config.getboolean('ldap', 'debug'):
-        sys.stderr.write("LDAP server config:      %s\n" % server)
+        sys.stderr.write(f"LDAP server config:      {server}\n")
 
     # Create the connection
     conn = None
@@ -96,34 +96,28 @@ def connect_ldap_server(config):
                               config.get('ldap', 'bind_password'),
                               auto_bind=True)
     except LDAPSocketOpenError as exception:
-        sys.stderr.write("Error connecting to the LDAP server: %s\n" %
-                         exception)
+        sys.stderr.write(f"Error connecting to the LDAP server: {exception}\n")
     except LDAPBindError as exception:
-        sys.stderr.write("Error binding to the LDAP server: %s\n" % exception)
-
+        sys.stderr.write(f"Error binding to the LDAP server: {exception}\n")
     except LDAPSASLBindInProgressError as exception:
-        sys.stderr.write("SASL bind in progress error: %s\n" % exception)
-
+        sys.stderr.write(f"SASL bind in progress error: {exception}\n")
     except LDAPSASLPrepError as exception:
-        sys.stderr.write("SASL prep error: %s\n" % exception)
-
+        sys.stderr.write(f"SASL prep error: {exception}\n")
     except LDAPSASLMechanismNotSupportedError as exception:
-        sys.stderr.write("SASL mechanism not supported error: %s\n" % exception)
-
+        sys.stderr.write(f"SASL mechanism not supported error: {exception}\n")
     # Debug
     if config.getboolean('ldap', 'debug'):
-        sys.stderr.write("Initial LDAP connection: %s\n" % conn)
-
+        sys.stderr.write(f"Initial LDAP connection: {conn}\n")
     # Enable TLS if STARTTLS is configured
     if uri.scheme != 'ldaps' and config.getboolean('ldap', 'use_starttls'):
         try:
             conn.start_tls()
         except LDAPStartTLSError as exception:
-            sys.stderr.write("Error starting TLS: %s\n" % exception)
+            sys.stderr.write(f"Error starting TLS: {exception}\n")
             return None
 
     # Debug
     if config.getboolean('ldap', 'debug'):
-        sys.stderr.write("Final LDAP connection:   %s\n" % conn)
+        sys.stderr.write(f"Final LDAP connection:   {conn}\n")
 
     return conn

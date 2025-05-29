@@ -30,8 +30,7 @@ def get_my_users(conn):
         "AND authentication_string IS NOT NULL;")
         rows = cur.fetchall()
     except mysql.connector.Error as exception:
-        sys.stderr.write("Error retrieving MySQL users: %s\n" %
-                         exception)
+        sys.stderr.write(f"Error retrieving MySQL users: {exception}\n")
         return None
 
     users = []
@@ -130,7 +129,7 @@ def get_user_privileges(config, user, with_grant=False):
         privilege_list = privilege_list[:-2]
 
     if privilege_list != '':
-        sql = 'GRANT %s ON %s.* TO "%s"' % (privilege_list, database, user)
+        sql = f'GRANT {privilege_list} ON {database}.* TO "{user}"'
         if with_grant:
             sql = sql + " WITH GRANT OPTION"
         sql = sql + ';'
@@ -167,7 +166,7 @@ def get_user_grants(config, user, with_admin=False):
         roles = roles[:-2]
 
     if roles != '':
-        sql = 'GRANT %s TO "%s"' % (roles, user)
+        sql = f'GRANT {roles} TO "{user}"'
 
         if with_admin:
             sql = sql + " WITH ADMIN OPTION"

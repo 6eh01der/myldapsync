@@ -59,17 +59,13 @@ def read_config(file):
     try:
         config.read(defaults)
     except configparser.Error as exception:
-        sys.stderr.write(
-            "Error reading default configuration file (%s): %s\n" %
-            (defaults, exception))
+        sys.stderr.write(f"Error reading default configuration file ({defaults}): {exception}\n")
         sys.exit(1)
 
     try:
         config.read(file)
     except configparser.Error as exception:
-        sys.stderr.write(
-            "Error reading user configuration file (%s): %s\n" %
-            (file, exception))
+        sys.stderr.write(f"Error reading user configuration file ({file}): {exception}\n")
         sys.exit(1)
 
     return config
@@ -220,8 +216,8 @@ def main():
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('CREATE USER "%s" IDENTIFIED %s; %s %s %s' %
-                        (user_name, identified, privilege_list, user_grants, user_admin_grants))
+                print(f'CREATE USER "{user_name}" IDENTIFIED {identified};\
+                      {privilege_list} {user_grants} {user_admin_grants}')
             else:
 
                 # This is a live run, so directly execute the SQL generated.
@@ -231,19 +227,17 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('CREATE USER "%s" IDENTIFIED %s;' %
-                                   (user_name, identified))
-                    cur.execute('%s' % privilege_list)
-                    cur.execute('%s' % user_grants)
-                    cur.execute('%s' % user_admin_grants)
+                    cur.execute(f'CREATE USER "{user_name}" IDENTIFIED {identified};')
+                    cur.execute(f'{privilege_list}')
+                    cur.execute(f'{user_grants}')
+                    cur.execute(f'{user_admin_grants}')
                     if (filter_string := config.get('mysql', 'filter_string')) != '' and \
                        ("(objectClass=group)" in filter_string or \
                        "(objectClass=groupOfNames)" in filter_string):
-                        cur.execute('GRANT PROXY ON "%s" TO ''@'';' % user_name)
+                        cur.execute(f'GRANT PROXY ON "{user_name}" TO ''@'';')
                     users_added = users_added + 1
                 except mysql.connector.Error as exception:
-                    sys.stderr.write("Error creating user %s: %s" % (user,
-                                                                     exception))
+                    sys.stderr.write(f"Error creating user {user}: {exception}")
                     users_add_errors = users_add_errors + 1
                     cur.execute('ROLLBACK;')
 
@@ -258,7 +252,7 @@ def main():
             if args.dry_run:
 
                 # It's a dry run, so just print the output
-                print('DROP USER "%s";' % user_name)
+                print(f'DROP USER "{user_name}";')
             else:
 
                 # This is a live run, so directly execute the SQL generated.
@@ -268,11 +262,10 @@ def main():
                 try:
                     # We can't use a real parameterised query here as we're
                     # working with an object, not data.
-                    cur.execute('DROP USER "%s";' % user_name)
+                    cur.execute(f'DROP USER "{user_name}";')
                     users_dropped = users_dropped + 1
                 except mysql.connector.Error as exception:
-                    sys.stderr.write("Error dropping user %s: %s" % (user,
-                                                                     exception))
+                    sys.stderr.write(f"Error dropping user {user}: {exception}")
                     users_drop_errors = users_drop_errors + 1
                     cur.execute('ROLLBACK;')
 
@@ -286,13 +279,11 @@ def main():
             cur.close()
 
             # Print the summary of work completed
-            print("Users added to MySQL:     %d" % users_added)
-            print("Users dropped from MySQL: %d" % users_dropped)
+            print(f"Users added to MySQL:     {users_added}")
+            print(f"Users dropped from MySQL: {users_dropped}")
             if users_add_errors > 0:
-                print("Errors adding users:         %d" %
-                      users_add_errors)
+                print(f"Errors adding users:         {users_add_errors}")
             if users_drop_errors > 0:
-                print("Errors dropping users:       %d" %
-                      users_drop_errors)
+                print(f"Errors dropping users:       {users_drop_errors}")
     else:
         print("No users were added or dropped.")
