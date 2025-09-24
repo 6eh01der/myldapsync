@@ -176,8 +176,8 @@ def main():
         if args.dry_run:
             print("START TRANSACTION;")
         else:
+            my_conn.start_transaction()
             cur = my_conn.cursor()
-            cur.execute("START TRANSACTION;")
 
     # Set authentication plugin
     if (auth_plugin := config.get('general', 'auth_plugin')) != '':
@@ -239,7 +239,7 @@ def main():
                 except mysql.connector.Error as exception:
                     sys.stderr.write(f"Error creating user {user}: {exception}")
                     users_add_errors = users_add_errors + 1
-                    cur.execute('ROLLBACK;')
+                    my_conn.rollback()
 
     # If we need to drop users from MySQL, then do so
     if config.getboolean('general', 'remove_users_from_mysql'):
@@ -267,7 +267,7 @@ def main():
                 except mysql.connector.Error as exception:
                     sys.stderr.write(f"Error dropping user {user}: {exception}")
                     users_drop_errors = users_drop_errors + 1
-                    cur.execute('ROLLBACK;')
+                    my_conn.rollback()
 
     if have_work:
 
@@ -275,8 +275,9 @@ def main():
         if args.dry_run:
             print("COMMIT;")
         else:
-            cur.execute("COMMIT;")
+            my_conn.commit()
             cur.close()
+            my_conn.close()
 
             # Print the summary of work completed
             print(f"Users added to MySQL:     {users_added}")
