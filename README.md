@@ -3,7 +3,7 @@
 This Python module allows you to synchronize MySQL or MariaDB users
 with users in an LDAP directory.
 
-Require MySQL 8 with installed and configured simple or sasl LDAP Authentication Plugin or PAM plugin (pam also supported in MySQL 5.7 and MariaDB).
+Require MySQL 8 with installed and configured simple or sasl LDAP Authentication Plugin or PAM plugin (pam also supported in MySQL 5.7 and MariaDB). It should also work with MySQL 9 (tests would be appreciated).
 
 Percona Server for MySQL:
 
